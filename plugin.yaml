@@ -1,0 +1,7 @@
+name: hermes-allow
+version: "1.0.0"
+description: "Allowlist-based terminal command guard for Hermes Agent. Only approved commands execute; everything else is blocked."
+author: StewLab
+kind: standalone
+provides_hooks:
+  - pre_tool_call
