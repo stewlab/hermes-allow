@@ -33,11 +33,11 @@ Restart Hermes. Allow mode is active with the default allowlist — no further c
 Every pattern is tested against both the full command string and the base name (first token).
 Either match counts as a hit. Patterns use glob syntax (`*` = wildcard).
 
-| Pattern          | Matches                          | Does not match              |
-|------------------|----------------------------------|-----------------------------|
-| `"git"`          | Any git command                  | —                           |
-| `"podman run *"` | `podman run -it fedora bash`     | `podman ps`, `podman prune` |
-| `"podman ps*"`   | `podman ps`, `podman ps -a`      | `podman run`                |
+| Pattern          | Matches                          | Does not match               |
+|------------------|----------------------------------|------------------------------|
+| `"git"`          | Any git command                  | —                            |
+| `"podman run *"` | `podman run -it fedora bash`     | `podman ps`, `podman prune`  |
+| `"podman ps*"`   | `podman ps`, `podman ps -a`      | `podman run`                 |
 
 Rule of thumb: no spaces = matches base name (broad). Spaces = matches full string (specific).
 
@@ -78,7 +78,7 @@ Commands intentionally absent from defaults (add to your config if needed):
 
 ```
 rm, mv, chmod, chown, ln     # file mutations — use the file tool instead
-kill, killall                 # process management
+kill, killall                # process management
 ssh, scp, rsync              # remote access
 tar, gzip, zip, unzip        # archives
 strace, gdb, valgrind        # debuggers
