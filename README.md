@@ -182,6 +182,9 @@ Expected output:
 hermes-allow tests
 ============================================================
 
+Testing _split_compound()...
+  ✓ All tests passed
+
 Testing _strip_env_prefix()...
   ✓ All tests passed
 
@@ -198,7 +201,7 @@ Testing edge cases...
   ✓ All tests passed
 
 ============================================================
-Results: 5/5 test groups passed
+Results: 6/6 test groups passed
 ============================================================
 ```
 
@@ -206,6 +209,7 @@ Results: 5/5 test groups passed
 
 The tests cover the core matching logic in isolation (no Hermes runtime required):
 
+- `_split_compound`: splitting on shell operators while respecting single/double quotes
 - `_strip_env_prefix`: env var stripping before matching
 - `_is_match`: glob pattern matching against base name and full command
 - `_check_allow`: allow mode — safe commands pass, destructive commands block, compound commands, env prefix handling
