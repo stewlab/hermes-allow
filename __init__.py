@@ -264,15 +264,30 @@ def _load_config_uncached() -> Tuple[str, List[str], List[str]]:
             )
             mode = 'allow'
 
-        allowed = entry.get('allowed', _DEFAULT_ALLOWED)
-        blocked = entry.get('blocked', _DEFAULT_BLOCKED)
+        persist_defaults = entry.get('persist_defaults', False)
 
-        if not isinstance(allowed, list):
+        user_allowed = entry.get('allowed', None)
+        user_blocked = entry.get('blocked', None)
+
+        if user_allowed is None:
+            allowed = list(_DEFAULT_ALLOWED)
+        elif not isinstance(user_allowed, list):
             logger.warning("hermes-allow: 'allowed' is not a list — using defaults")
             allowed = list(_DEFAULT_ALLOWED)
-        if not isinstance(blocked, list):
+        elif persist_defaults:
+            allowed = list(_DEFAULT_ALLOWED) + user_allowed
+        else:
+            allowed = user_allowed
+
+        if user_blocked is None:
+            blocked = list(_DEFAULT_BLOCKED)
+        elif not isinstance(user_blocked, list):
             logger.warning("hermes-allow: 'blocked' is not a list — using defaults")
             blocked = list(_DEFAULT_BLOCKED)
+        elif persist_defaults:
+            blocked = list(_DEFAULT_BLOCKED) + user_blocked
+        else:
+            blocked = user_blocked
 
         logger.debug(
             'hermes-allow: loaded config mode=%r allowed=%d patterns blocked=%d patterns',

@@ -152,6 +152,10 @@ plugins:
       enabled: true              # false = plugin is a passthrough (all commands allowed)
       mode: allow                # 'allow' or 'block'
 
+      # When true, the built-in default list is merged with your custom list.
+      # When false (default), your custom list fully replaces the defaults.
+      persist_defaults: false
+
       # allow mode: list of permitted patterns. Omit to use the built-in defaults.
       allowed:
         - 'git'

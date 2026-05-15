@@ -22,6 +22,7 @@ from __init__ import (
     _check_block,
     _strip_env_prefix,
     _split_compound,
+    _load_config_uncached,
     _DEFAULT_ALLOWED,
     _DEFAULT_BLOCKED,
 )
@@ -651,9 +652,80 @@ def test_edge_cases():
     print('  ✓ All tests passed')
 
 
+def test_persist_defaults():
+    """persist_defaults merges default list with user-supplied custom entries."""
+    print('\nTesting persist_defaults...')
+
+    from unittest.mock import patch as mock_patch
+
+    custom_allowed = ['ssh', 'rsync']
+    custom_blocked = ['strace *']
+
+    # --- persist_defaults=False (default): custom list fully replaces defaults ---
+    fake_entry_replace = {
+        'enabled': True,
+        'mode': 'allow',
+        'persist_defaults': False,
+        'allowed': custom_allowed,
+        'blocked': custom_blocked,
+    }
+    with mock_patch('__init__.load_config', return_value={}), \
+         mock_patch('__init__.cfg_get', return_value=fake_entry_replace):
+        mode, allowed, blocked = _load_config_uncached()
+
+    assert_equal(mode, 'allow')
+    # Only custom entries — defaults are NOT present
+    assert_equal(allowed, custom_allowed)
+    assert_equal(blocked, custom_blocked)
+    # A default entry like 'git' should be absent
+    assert_false('git' in allowed, 'defaults should be absent when persist_defaults=False')
+
+    # --- persist_defaults=True: defaults prepended, then custom entries appended ---
+    fake_entry_merge = {
+        'enabled': True,
+        'mode': 'allow',
+        'persist_defaults': True,
+        'allowed': custom_allowed,
+        'blocked': custom_blocked,
+    }
+    with mock_patch('__init__.load_config', return_value={}), \
+         mock_patch('__init__.cfg_get', return_value=fake_entry_merge):
+        mode, allowed, blocked = _load_config_uncached()
+
+    assert_equal(mode, 'allow')
+    # Defaults must be present
+    assert_true('git' in allowed, 'defaults should be present when persist_defaults=True')
+    assert_true('cargo' in allowed, 'defaults should be present when persist_defaults=True')
+    # Custom entries must also be present
+    assert_true('ssh' in allowed, 'custom entry should be in merged list')
+    assert_true('rsync' in allowed, 'custom entry should be in merged list')
+    # Defaults come first, custom entries appended
+    git_idx = allowed.index('git')
+    ssh_idx = allowed.index('ssh')
+    assert_true(git_idx < ssh_idx, 'defaults should appear before custom entries')
+
+    # Blocked list: default blocked entries present, plus custom appended
+    assert_true(any('rm' in p for p in blocked), 'default blocked patterns should be present')
+    assert_true('strace *' in blocked, 'custom blocked pattern should be present')
+
+    # --- persist_defaults=True with no user list: same as omitting (defaults only) ---
+    fake_entry_no_custom = {
+        'enabled': True,
+        'mode': 'allow',
+        'persist_defaults': True,
+    }
+    with mock_patch('__init__.load_config', return_value={}), \
+         mock_patch('__init__.cfg_get', return_value=fake_entry_no_custom):
+        mode, allowed, blocked = _load_config_uncached()
+
+    assert_equal(allowed, list(_DEFAULT_ALLOWED))
+    assert_equal(blocked, list(_DEFAULT_BLOCKED))
+
+    print('  ✓ All tests passed')
+
+
 # ---------------------------------------------------------------------------
 # Test runner
-# ---------------------------------------------------------------------------
 
 
 def main():
@@ -668,6 +740,7 @@ def main():
         test_check_allow,
         test_check_block,
         test_edge_cases,
+        test_persist_defaults,
     ]
 
     passed = 0
