@@ -35,9 +35,9 @@ Either match counts as a hit. Patterns use glob syntax (`*` = wildcard).
 
 | Pattern          | Matches                          | Does not match               |
 |------------------|----------------------------------|------------------------------|
-| `"git"`          | Any git command                  | —                            |
-| `"podman run *"` | `podman run -it fedora bash`     | `podman ps`, `podman prune`  |
-| `"podman ps*"`   | `podman ps`, `podman ps -a`      | `podman run`                 |
+| `'git'`          | Any git command                  | —                            |
+| `'podman run *'` | `podman run -it fedora bash`     | `podman ps`, `podman prune`  |
+| `'podman ps*'`   | `podman ps`, `podman ps -a`      | `podman run`                 |
 
 Rule of thumb: no spaces = matches base name (broad). Spaces = matches full string (specific).
 
@@ -95,11 +95,11 @@ plugins:
     hermes-allow:
       mode: block
       blocked:
-        - "rm *-rf *"
-        - "podman *prune*"
-        - "docker *prune*"
-        - "podman system *"
-        - "docker system *"
+        - 'rm *-rf *'
+        - 'podman *prune*'
+        - 'docker *prune*'
+        - 'podman system *'
+        - 'docker system *'
 ```
 
 Default blocklist (when `blocked` is not set in config):
@@ -150,19 +150,19 @@ plugins:
   entries:
     hermes-allow:
       enabled: true              # false = plugin is a passthrough (all commands allowed)
-      mode: allow                # "allow" or "block"
+      mode: allow                # 'allow' or 'block'
 
       # allow mode: list of permitted patterns. Omit to use the built-in defaults.
       allowed:
-        - "git"
-        - "cargo"
-        - "podman run *"
+        - 'git'
+        - 'cargo'
+        - 'podman run *'
 
       # block mode: list of blocked patterns. Omit to use the built-in defaults.
       # Set to [] to run with no blocklist (pure passthrough in block mode).
       blocked:
-        - "rm *-rf *"
-        - "podman *prune*"
+        - 'rm *-rf *'
+        - 'podman *prune*'
 ```
 
 ## Development
